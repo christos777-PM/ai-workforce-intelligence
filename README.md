@@ -36,6 +36,9 @@ CSV job descriptions
 └─────────┬─────────┘
           ▼
    JSON / terminal output
+          │
+          ▼
+   Target-role gap analysis
 ```
 
 ## Current capabilities
@@ -46,7 +49,7 @@ CSV job descriptions
 - Role-level skill extraction
 - Category-level frequency analysis
 - Top-skill analysis
-- Basic skills-gap and coverage functions
+- Target-role coverage and skills-gap analysis
 - JSON output for downstream workflows
 - Automated tests
 - GitHub Actions CI across Python 3.10–3.13
@@ -78,7 +81,21 @@ Machine-readable output:
 workforce-intel data/sample_jobs.csv --json
 ```
 
-### 3. Run tests
+### 3. Run a target-role gap analysis
+
+```bash
+workforce-intel data/sample_jobs.csv --target data/targets/ai_project_manager.json
+```
+
+JSON output:
+
+```bash
+workforce-intel data/sample_jobs.csv --target data/targets/ai_project_manager.json --json
+```
+
+The target-role report calculates coverage against the observed skills in the analyzed dataset and lists the missing skills. It is an analytical prototype, not a measure of individual candidate proficiency.
+
+### 4. Run tests
 
 ```bash
 python -m unittest discover -s tests -v
@@ -94,6 +111,8 @@ The pipeline reports:
 - capability-category frequency
 - most frequently observed skills
 - role-level extracted skills
+- optional target-role coverage
+- optional target-role skills gap
 
 The sample data is intentionally small and illustrative. It should not be interpreted as a labor-market estimate.
 
@@ -102,7 +121,9 @@ The sample data is intentionally small and illustrative. It should not be interp
 ```
 .
 ├── data/
-│   └── sample_jobs.csv
+│   ├── sample_jobs.csv
+│   └── targets/
+│       └── ai_project_manager.json
 ├── docs/
 │   └── methodology.md
 ├── src/
@@ -141,13 +162,13 @@ The prototype should use public, licensed or synthetic job data. Do not upload p
 - [x] Role-level analysis
 - [x] Frequency analysis
 - [x] Skills-gap primitives
+- [x] Target-role gap analysis
 - [x] Automated tests
 - [x] CI across Python versions
 - [ ] Larger licensed job dataset
 - [ ] Pandas-based analytical layer
 - [ ] Embedding-based semantic matching
 - [ ] LLM-assisted extraction with evaluation
-- [ ] Skills-gap scoring by target role
 - [ ] Visualization dashboard
 - [ ] Database-backed longitudinal analysis
 - [ ] Cloud deployment
