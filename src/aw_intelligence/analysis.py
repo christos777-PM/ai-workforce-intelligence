@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import dataclass
 
-from .extractor import SkillMatch, category_counts
+from .extractor import SkillMatch, extract_skills
 
 
 @dataclass(frozen=True)
@@ -16,14 +16,13 @@ class RoleAnalysis:
 
 def analyze_roles(rows: list[dict[str, str]]) -> list[RoleAnalysis]:
     """Extract skills from rows containing title and description fields."""
-    analyses: list[RoleAnalysis] = []
-    for row in rows:
-        title = row.get("title", "").strip()
-        description = row.get("description", "")
-        analyses.append(RoleAnalysis(title=title, skills=tuple(__import__(
-            "aw_intelligence.extractor", fromlist=["extract_skills"]
-        ).extract_skills(description))))
-    return analyses
+    return [
+        RoleAnalysis(
+            title=row.get("title", "").strip(),
+            skills=tuple(extract_skills(row.get("description", ""))),
+        )
+        for row in rows
+    ]
 
 
 def frequency_by_category(analyses: list[RoleAnalysis]) -> Counter[str]:
