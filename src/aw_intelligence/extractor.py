@@ -19,6 +19,7 @@ class SkillMatch:
 def normalize_text(text: str) -> str:
     """Normalize text for case-insensitive matching."""
     text = text.lower().replace("&", " and ")
+    text = re.sub(r"\bapis\b", "api", text)
     return re.sub(r"\s+", " ", text).strip()
 
 
