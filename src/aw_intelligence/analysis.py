@@ -14,6 +14,16 @@ class RoleAnalysis:
     skills: tuple[SkillMatch, ...]
 
 
+@dataclass(frozen=True)
+class RoleFit:
+    """Coverage of a single observed role against a target skill set."""
+
+    title: str
+    coverage_percent: float
+    matched_skills: tuple[str, ...]
+    missing_skills: tuple[str, ...]
+
+
 def analyze_roles(rows: list[dict[str, str]]) -> list[RoleAnalysis]:
     """Extract skills from rows containing title and description fields."""
     return [
@@ -51,3 +61,21 @@ def coverage_score(required: set[str], present: set[str]) -> float:
 def skill_gap(required: set[str], present: set[str]) -> set[str]:
     """Return required skills absent from the observed capability set."""
     return required - present
+
+
+def role_fit(analyses: list[RoleAnalysis], required: set[str]) -> list[RoleFit]:
+    """Rank observed roles by coverage of a target capability profile."""
+    fits = []
+    for role in analyses:
+        present = {match.skill for match in role.skills}
+        matched = tuple(sorted(required & present))
+        missing = tuple(sorted(required - present))
+        fits.append(
+            RoleFit(
+                title=role.title,
+                coverage_percent=coverage_score(required, present),
+                matched_skills=matched,
+                missing_skills=missing,
+            )
+        )
+    return sorted(fits, key=lambda fit: (-fit.coverage_percent, fit.title.lower()))
