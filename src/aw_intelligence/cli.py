@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 
-from .analysis import analyze_roles, coverage_score, frequency_by_category, skill_gap, top_skills
+from .analysis import analyze_roles, coverage_score, frequency_by_category, role_fit, skill_gap, top_skills
 from .io import read_jobs, read_target_skills
 
 
@@ -40,10 +40,20 @@ def main() -> None:
 
     if args.target:
         required = read_target_skills(args.target)
+        fits = role_fit(analyses, required)
         payload["target_role"] = {
             "required_skills": sorted(required),
             "coverage_percent": coverage_score(required, observed_skills),
             "skills_gap": sorted(skill_gap(required, observed_skills)),
+            "role_fit": [
+                {
+                    "title": fit.title,
+                    "coverage_percent": fit.coverage_percent,
+                    "matched_skills": list(fit.matched_skills),
+                    "missing_skills": list(fit.missing_skills),
+                }
+                for fit in fits
+            ],
         }
 
     if args.json:
@@ -61,6 +71,9 @@ def main() -> None:
     if "target_role" in payload:
         target = payload["target_role"]
         print(f"\nTarget-role coverage: {target['coverage_percent']}%")
+        print("Role fit ranking:")
+        for fit in target["role_fit"]:
+            print(f"  {fit['title']}: {fit['coverage_percent']}%")
         print("Skills gap:")
         for skill in target["skills_gap"]:
             print(f"  - {skill}")
