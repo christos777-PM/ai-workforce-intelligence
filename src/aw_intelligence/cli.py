@@ -7,6 +7,7 @@ import json
 
 from .analysis import analyze_roles, coverage_score, frequency_by_category, skill_gap, top_skills
 from .io import read_jobs, read_target_skills
+from .role_fit import rank_role_fit
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -40,10 +41,23 @@ def main() -> None:
 
     if args.target:
         required = read_target_skills(args.target)
+        role_fit = rank_role_fit(
+            [(role.title, {match.skill for match in role.skills}) for role in analyses],
+            required,
+        )
         payload["target_role"] = {
             "required_skills": sorted(required),
             "coverage_percent": coverage_score(required, observed_skills),
             "skills_gap": sorted(skill_gap(required, observed_skills)),
+            "role_fit": [
+                {
+                    "title": result.title,
+                    "coverage_percent": result.coverage_percent,
+                    "matched_skills": list(result.matched_skills),
+                    "missing_skills": list(result.missing_skills),
+                }
+                for result in role_fit
+            ],
         }
 
     if args.json:
@@ -64,6 +78,9 @@ def main() -> None:
         print("Skills gap:")
         for skill in target["skills_gap"]:
             print(f"  - {skill}")
+        print("\nRole fit ranking:")
+        for result in target["role_fit"]:
+            print(f"  {result['title']}: {result['coverage_percent']}%")
 
 
 if __name__ == "__main__":
