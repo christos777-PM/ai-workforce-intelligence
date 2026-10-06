@@ -7,6 +7,7 @@ import json
 
 from .analysis import analyze_roles, coverage_score, frequency_by_category, skill_gap, top_skills
 from .io import read_jobs, read_target_skills
+from .role_fit import rank_role_fit
 
 
 def build_parser() -> argparse.ArgumentParser:
