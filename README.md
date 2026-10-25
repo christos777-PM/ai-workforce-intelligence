@@ -39,6 +39,9 @@ CSV job descriptions
           │
           ▼
    Target-role gap analysis
+          │
+          ▼
+   Optional role-fit ranking
 ```
 
 ## Current capabilities
@@ -50,6 +53,7 @@ CSV job descriptions
 - Category-level frequency analysis
 - Top-skill analysis
 - Target-role coverage and skills-gap analysis
+- Optional role ranking by transparent target-skill coverage
 - JSON output for downstream workflows
 - Automated tests
 - GitHub Actions CI across Python 3.10–3.13
@@ -93,9 +97,21 @@ JSON output:
 workforce-intel data/sample_jobs.csv --target data/targets/ai_project_manager.json --json
 ```
 
-The target-role report calculates coverage against the observed skills in the analyzed dataset and lists the missing skills. It is an analytical prototype, not a measure of individual candidate proficiency.
+### 4. Rank observed roles against a target capability profile
 
-### 4. Run tests
+```bash
+workforce-intel data/sample_jobs.csv --target data/targets/ai_project_manager.json --rank-target
+```
+
+For a machine-readable ranking:
+
+```bash
+workforce-intel data/sample_jobs.csv --target data/targets/ai_project_manager.json --rank-target --json
+```
+
+The ranking orders the supplied job descriptions by the percentage of target skills detected in each description. It includes matched and missing skills so readers can inspect why a role received its score. The score is a description-level signal, not an assessment of a person's proficiency, employability or suitability. Results depend on the sample, taxonomy and deterministic matching rules.
+
+### 5. Run tests
 
 ```bash
 python -m unittest discover -s tests -v
@@ -113,6 +129,7 @@ The pipeline reports:
 - role-level extracted skills
 - optional target-role coverage
 - optional target-role skills gap
+- optional ranked role descriptions with matched and missing target skills
 
 The sample data is intentionally small and illustrative. It should not be interpreted as a labor-market estimate.
 
@@ -132,10 +149,13 @@ The sample data is intentionally small and illustrative. It should not be interp
 │       ├── cli.py
 │       ├── extractor.py
 │       ├── io.py
+│       ├── role_fit.py
 │       └── taxonomy.py
 ├── tests/
+│   ├── test_cli.py
 │   ├── test_extractor.py
-│   └── test_pipeline.py
+│   ├── test_pipeline.py
+│   └── test_role_fit.py
 ├── .github/workflows/ci.yml
 ├── pyproject.toml
 └── README.md
@@ -163,6 +183,7 @@ The prototype should use public, licensed or synthetic job data. Do not upload p
 - [x] Frequency analysis
 - [x] Skills-gap primitives
 - [x] Target-role gap analysis
+- [x] Target-role fit ranking in the CLI
 - [x] Automated tests
 - [x] CI across Python versions
 - [ ] Larger licensed job dataset
