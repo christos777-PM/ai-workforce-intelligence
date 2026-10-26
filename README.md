@@ -42,6 +42,9 @@ CSV job descriptions
           │
           ▼
    Optional role-fit ranking
+          │
+          ▼
+   Optional benchmark JSONL export
 ```
 
 ## Current capabilities
@@ -55,6 +58,7 @@ CSV job descriptions
 - Target-role coverage and skills-gap analysis
 - Optional role ranking by transparent target-skill coverage
 - JSON output for downstream workflows
+- JSONL prediction export for external benchmark evaluation
 - Automated tests
 - GitHub Actions CI across Python 3.10–3.13
 - Methodology and limitations documentation
@@ -111,7 +115,17 @@ workforce-intel data/sample_jobs.csv --target data/targets/ai_project_manager.js
 
 The ranking orders the supplied job descriptions by the percentage of target skills detected in each description. It includes matched and missing skills so readers can inspect why a role received its score. The score is a description-level signal, not an assessment of a person's proficiency, employability or suitability. Results depend on the sample, taxonomy and deterministic matching rules.
 
-### 5. Run tests
+### 5. Export predictions for benchmark evaluation
+
+```bash
+workforce-intel data/sample_jobs.csv --predictions-jsonl /tmp/workforce-predictions.jsonl
+```
+
+The command writes one JSON object per role, with a stable `role_id`, title and sorted unique `predicted_skills` array. By default, the ID is a normalized slug of the title. If a CSV includes a `role_id` column, that explicit value is used instead. Duplicate IDs are rejected rather than silently assigned order-dependent suffixes.
+
+The output schema is compatible with the evaluator in [AI & Quantum Human Capital](https://github.com/christos777-PM/ai-quantum-human-capital). Evaluate it only against a reference JSONL file with matching role IDs and human-reviewed `gold_skills`. Exporting predictions is not itself evidence of accuracy; the benchmark's provenance, labels and limitations determine what conclusions are justified.
+
+### 6. Run tests
 
 ```bash
 python -m unittest discover -s tests -v
@@ -130,6 +144,7 @@ The pipeline reports:
 - optional target-role coverage
 - optional target-role skills gap
 - optional ranked role descriptions with matched and missing target skills
+- optional JSONL predictions for an external evaluator
 
 The sample data is intentionally small and illustrative. It should not be interpreted as a labor-market estimate.
 
@@ -146,12 +161,14 @@ The sample data is intentionally small and illustrative. It should not be interp
 ├── src/
 │   └── aw_intelligence/
 │       ├── analysis.py
+│       ├── benchmark.py
 │       ├── cli.py
 │       ├── extractor.py
 │       ├── io.py
 │       ├── role_fit.py
 │       └── taxonomy.py
 ├── tests/
+│   ├── test_benchmark_export.py
 │   ├── test_cli.py
 │   ├── test_extractor.py
 │   ├── test_pipeline.py
@@ -184,6 +201,7 @@ The prototype should use public, licensed or synthetic job data. Do not upload p
 - [x] Skills-gap primitives
 - [x] Target-role gap analysis
 - [x] Target-role fit ranking in the CLI
+- [x] JSONL prediction export for benchmark evaluation
 - [x] Automated tests
 - [x] CI across Python versions
 - [ ] Larger licensed job dataset
