@@ -6,6 +6,7 @@ import argparse
 import json
 
 from .analysis import analyze_roles, coverage_score, frequency_by_category, skill_gap, top_skills
+from .benchmark import write_predictions_jsonl
 from .io import read_jobs, read_target_skills
 from .role_fit import rank_role_fit
 
@@ -20,6 +21,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Rank observed roles by coverage of the target role's required skills (requires --target)",
     )
+    parser.add_argument(
+        "--predictions-jsonl",
+        metavar="PATH",
+        help="Write extracted skills as evaluator-compatible JSONL records",
+    )
     parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
     return parser
 
@@ -30,7 +36,11 @@ def main() -> None:
     if args.rank_target and not args.target:
         parser.error("--rank-target requires --target")
 
-    analyses = analyze_roles(read_jobs(args.csv))
+    rows = read_jobs(args.csv)
+    analyses = analyze_roles(rows)
+    if args.predictions_jsonl:
+        write_predictions_jsonl(rows, analyses, args.predictions_jsonl)
+
     observed_skills = {match.skill for role in analyses for match in role.skills}
     payload = {
         "roles_analyzed": len(analyses),
