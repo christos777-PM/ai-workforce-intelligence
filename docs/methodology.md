@@ -18,7 +18,7 @@ It is designed for portfolio demonstration and research prototyping, not automat
 
 ## Alias policy
 
-The taxonomy lists plural forms for selected skills such as API, LLM, microcontroller, FPGA, ASIC and semiconductor. Each alias maps to an existing canonical label; the extractor does not apply broad stemming or infer semantic equivalence. Additions should be explicit, tested, and reviewed for overlap with longer phrases.
+The taxonomy lists plural forms for selected skills such as API, LLM, microcontroller, FPGA, ASIC and semiconductor. It also maps the abbreviation "AI" to the canonical label "artificial intelligence". When "AI" appears inside a longer listed phrase such as "generative AI", longest-phrase overlap handling preserves the more specific canonical label. Each alias maps to an existing canonical label; the extractor does not apply broad stemming or infer semantic equivalence. Additions should be explicit, tested, and reviewed for overlap with longer phrases.
 
 ## Why rule-based first?
 

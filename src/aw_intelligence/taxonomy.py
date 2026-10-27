@@ -39,6 +39,7 @@ SKILL_TAXONOMY: dict[str, tuple[str, ...]] = {
 # Common surface forms mapped to the taxonomy's canonical skill label.
 # Keep this explicit and auditable rather than applying broad stemming.
 SKILL_ALIASES: dict[str, tuple[str, ...]] = {
+    "artificial intelligence": ("ai",),
     "llm": ("llms",),
     "large language model": ("large language models",),
     "api": ("apis",),
