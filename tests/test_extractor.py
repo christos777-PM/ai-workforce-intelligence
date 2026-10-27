@@ -19,6 +19,27 @@ class TestExtractor(unittest.TestCase):
         matches = extract_skills("A pythonic workflow uses javascript.")
         self.assertEqual([m.skill for m in matches], ["javascript"])
 
+    def test_plural_aliases_map_to_canonical_labels(self):
+        matches = extract_skills(
+            "APIs, LLMs, microcontrollers, FPGAs, ASICs, and semiconductors."
+        )
+        result = {match.skill for match in matches}
+        self.assertEqual(
+            result,
+            {"api", "llm", "microcontroller", "fpga", "asic", "semiconductor"},
+        )
+
+    def test_specific_rest_api_match_suppresses_overlapping_generic_api(self):
+        matches = extract_skills("The service exposes REST APIs and APIs.")
+        counts = {match.skill: match.occurrences for match in matches}
+        self.assertEqual(counts["rest api"], 1)
+        self.assertEqual(counts["api"], 1)
+
+    def test_singular_and_plural_forms_share_one_count(self):
+        matches = extract_skills("An API and several APIs are documented.")
+        counts = {match.skill: match.occurrences for match in matches}
+        self.assertEqual(counts["api"], 2)
+
     def test_gap_and_coverage(self):
         required = {"python", "sql", "aws"}
         present = {"python", "aws"}
