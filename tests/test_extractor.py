@@ -29,6 +29,17 @@ class TestExtractor(unittest.TestCase):
             {"api", "llm", "microcontroller", "fpga", "asic", "semiconductor"},
         )
 
+    def test_ai_abbreviation_maps_to_canonical_artificial_intelligence(self):
+        matches = extract_skills("AI project manager responsible for artificial intelligence delivery.")
+        counts = {match.skill: match.occurrences for match in matches}
+        self.assertEqual(counts["artificial intelligence"], 2)
+
+    def test_ai_alias_does_not_double_count_generative_ai(self):
+        matches = extract_skills("Build generative AI products.")
+        counts = {match.skill: match.occurrences for match in matches}
+        self.assertEqual(counts["generative ai"], 1)
+        self.assertNotIn("artificial intelligence", counts)
+
     def test_specific_rest_api_match_suppresses_overlapping_generic_api(self):
         matches = extract_skills("The service exposes REST APIs and APIs.")
         counts = {match.skill: match.occurrences for match in matches}
