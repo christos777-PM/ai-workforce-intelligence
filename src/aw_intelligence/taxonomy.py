@@ -36,6 +36,20 @@ SKILL_TAXONOMY: dict[str, tuple[str, ...]] = {
     ),
 }
 
+# Common surface forms mapped to the taxonomy's canonical skill label.
+# Keep this explicit and auditable rather than applying broad stemming.
+SKILL_ALIASES: dict[str, tuple[str, ...]] = {
+    "llm": ("llms",),
+    "large language model": ("large language models",),
+    "api": ("apis",),
+    "rest api": ("rest apis",),
+    "microcontroller": ("microcontrollers",),
+    "asic": ("asics",),
+    "fpga": ("fpgas",),
+    "semiconductor": ("semiconductors",),
+}
+
+
 def all_skills() -> tuple[str, ...]:
     """Return unique skills in deterministic order."""
     return tuple(dict.fromkeys(skill for skills in SKILL_TAXONOMY.values() for skill in skills))
